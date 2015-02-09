@@ -1,0 +1,104 @@
+/* This program will cause an RGB LED to blink from green to red
+if one of three conditions is met - if either of the two FSR sensors
+mounted on the shoulders of a shirt read greater than 1000, or if the
+flex sensor on the spine of the shirt is bent more than 15 degrees.
+*/
+//Program by Andrew Kroetsch, Feb 2015. 
+
+    // Initialize variables
+int ledPin = 13;             // LED is connected to digital pin 13
+int redPin = 9;              // R petal on RGB LED module connected to digital pin 9
+int greenPin = 11;           // G petal on RGB LED module connected to digital pin 11
+int bluePin = 10;            // B petal on RGB LED module connected to digital pin 10
+int Left_FSR_Pin = A5;       // Left shoulder FSR pin is connected to analog pin 5
+int Right_FSR_Pin = A3;      // Right shoulder FSR pin is connected to analog pin 3
+
+void setup()
+{
+    // Initialize serial communications
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);    // sets the ledPin to be an output
+  pinMode(redPin, OUTPUT);    // sets the redPin to be an output
+  pinMode(greenPin, OUTPUT);  // sets the greenPin to be an output
+  pinMode(bluePin, OUTPUT);   // sets the bluePin to be an output
+}
+
+void loop()
+{
+    // Convert flex sensor readings into degrees
+  int FlexSensor, degrees;
+  
+    // Read the voltage from the left shoulder FSR Pin
+  int LeftFSRReading = analogRead(Left_FSR_Pin);
+  
+    // Read the voltage from the right shoulder FSR Pin
+  int RightFSRReading = analogRead(Right_FSR_Pin);
+  
+    // Read the voltage from the flex sensor 
+  FlexSensor = analogRead(A2);
+  
+    // Convert the voltage reading to inches
+    // The first two numbers are the sensor values for straight (303) and bent (165)
+    // The second two numbers are the degree readings mapped to them (0 and 90 degrees)
+  degrees = map(FlexSensor, 95, 165, 0, 90);
+  
+    // Print out the result for the flex sensor
+  Serial.print("FlexSensor: ");
+  Serial.print(FlexSensor,DEC);
+  Serial.print("your spine is this bent: ");
+  Serial.println(degrees,DEC);
+  
+    // Pause before taking the next reading
+  delay(250);
+  
+  if(degrees<15){
+    // Turn the RGB LED green
+    color(0,255,0);
+  }
+    // If your back is too bent
+  else{
+    // Turn the RGB LED red
+    color(255,0,0);
+  }
+  
+    // Print out the voltage readings of the Left FSR input
+Serial.print("left FSR sensor: ");
+Serial.println(LeftFSRReading);
+delay(250);     // Pause before taking the next reading
+
+  
+  if(LeftFSRReading<1000){
+    // Turn the RGB LED green
+    color(0,255,0);
+  }
+  
+  else{
+    // If there is too much pressure, turn the RGB LED red
+    color(255,0,0);
+  }
+
+    // print out the voltage readings of the Right FSR input
+Serial.print("right FSR sensor: ");
+Serial.println(RightFSRReading);
+delay(250);   // pause before taking the next reading
+
+  if(RightFSRReading<1000){
+    //Turn the RGB LED green
+    color(0,255,0);
+  }
+  
+  else{
+    // If there is too much pressure, turn the RGB LED red
+    color(255,0,0);
+  }
+  
+}
+
+void color (unsigned char red, unsigned char green, unsigned char blue)
+    // the color generating function
+        
+{
+  analogWrite(redPin, 255-red);
+  analogWrite(bluePin, 255-blue);
+  analogWrite(greenPin, 255-green);
+}
